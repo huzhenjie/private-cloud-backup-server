@@ -1,0 +1,14 @@
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+node_modules
+.DS_Store
+static/tmp
+
+.env.local
+.env.*.local
