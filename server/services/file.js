@@ -1,10 +1,10 @@
+const FS = require("fs")
+const Config = require("../../config")
 const FileModel = require('../models/file')
 const TmpFileModel = require('../models/tmp-file')
 const TmpFileChunkModel = require('../models/tmp-file-chunk')
-const FS = require("fs")
 const FileUtil = require("../utils/file")
 const Util = require('../utils/index')
-const Config = require("../../config")
 
 module.exports.h5UploadApply = async file_info_list => {
   return await Promise.all(file_info_list.map(async ({ file_name, file_type, file_size, file_time }) => {
@@ -77,17 +77,21 @@ module.exports.h5Upload = async (tmp_file_id, offset, file) => {
   await TmpFileChunkModel.updateChunk(chunk.id, {
     state: TmpFileChunkModel.STATE_OK
   })
-  // const file_md5 = await FileUtil.fileMd5(server_path)
 }
 
 module.exports.h5Combine = async tmp_file_id => {
-  const tmp_file = await TmpFileModel.getFile(tmp_file_id, 'state,file_name')
+  const tmp_file = await TmpFileModel.getFile(
+    tmp_file_id,
+    'state,file_name,file_size,file_md5,file_type,file_time,client_type,origin_path'
+  )
   if (!tmp_file) {
     throw new Error('file apply info not found')
   }
-  if (tmp_file.state === TmpFileModel.STATE_OK) {
-    return
-  }
+  const { state, file_name, file_size, file_md5, file_type, file_time, client_type, origin_path } = tmp_file
+  // if (state === TmpFileModel.STATE_OK) {
+  //   console.log('file already combine')
+  //   return
+  // }
   const chunks = await TmpFileChunkModel.getChunksByTmpFileId(tmp_file_id, 'offset,chunk_size,server_path,state')
   if (chunks.length === 0) {
     throw new Error('chunks not found')
@@ -96,28 +100,66 @@ module.exports.h5Combine = async tmp_file_id => {
   if (chunk_not_all_ok) {
     throw new Error('chunks not all ok')
   }
-  const server_path = getAbsServerPath(tmp_file.file_name)
+  const server_path = getAbsServerPath(file_name)
   const chunk_paths = chunks.map(item => item.server_path)
-  combineFile(server_path, chunk_paths)
+  await FileUtil.combineFile(server_path, chunk_paths)
+  const curr_file_size = FileUtil.fileSize(server_path)
+  if (curr_file_size !== file_size) {
+    FileUtil.delFile(server_path)
+    throw new Error('file size not match')
+  }
   const md5 = await FileUtil.fileMd5(server_path)
-  console.log(md5)
-  const file_size = FileUtil.fileSize(server_path)
-  console.log(file_size)
+  if (file_md5 && md5 !== file_md5) {
+    FileUtil.delFile(server_path)
+    throw new Error('file md5 not match')
+  }
+  await FileModel.addFile({
+    file_size,
+    file_name,
+    file_type,
+    file_time,
+    client_type,
+    origin_path,
+    server_path,
+    file_md5: md5,
+    create_time: Date.now()
+  })
+  await TmpFileModel.updateFile(tmp_file_id, {
+    state: TmpFileModel.STATE_OK
+  })
+  chunks.forEach(chunk => {
+    const path = chunk.server_path
+    console.log(`Remove chunk file ${path}`)
+    FileUtil.delFile(path)
+  })
+}
+
+module.exports.download = async ctx => {
+  const { file_id } = ctx.params
+  const file = await FileModel.getFile(file_id, 'server_path')
+  if (!file) {
+    throw new Error('file not found')
+  }
+  ctx.attachment(file.server_path)
+}
+
+module.exports.getFile = async (file_id, cols = '*') => {
+  return await FileModel.getFile(file_id, cols)
 }
 
 function getAbsServerPath(file_name) {
   const dir = Config.path.source_path + 'file/' + Util.fmtDatetime(Date.now(), 'yyyyMMdd') + '/'
   FileUtil.mkdir(dir)
   const index = file_name.lastIndexOf('.')
-  let file_name_param = file_name
-  let file_type_param = ''
+  let name = file_name
+  let ext = ''
   if (index > -1) {
-    file_type_param = file_name.substring(index) // .jpg if file_name.jpg
-    file_name_param = file_name.substring(0, index) // file_name if file_name.jpg
+    ext = file_name.substring(index) // .jpg if file_name.jpg
+    name = file_name.substring(0, index) // file_name if file_name.jpg
   }
   let i = 0
   while (true) {
-    const target_file_name = i === 0 ? file_name : file_name_param + '_' + i + file_type_param
+    const target_file_name = i === 0 ? file_name : name + '_' + i + ext
     const path = dir + target_file_name
     if (FS.existsSync(path)) {
       i++
@@ -125,26 +167,4 @@ function getAbsServerPath(file_name) {
       return path
     }
   }
-}
-
-// function combineFile(target_path, source_paths) {
-//   source_paths.forEach(source_path => {
-//     FS.appendFileSync(target_path, FS.readFileSync(source_path))
-//   })
-// }
-
-function combineFile(target_path, source_paths) {
-  const writer = FS.createWriteStream(target_path)
-  mergeStream(writer, source_paths)
-}
-
-function mergeStream(writer, source_paths) {
-  if (source_paths.length === 0) {
-    return
-  }
-  const reader = FS.createReadStream(source_paths.shift())
-  reader.pipe(writer, { end: false })
-  reader.on('end', () => {
-    mergeStream(writer, source_paths)
-  })
 }

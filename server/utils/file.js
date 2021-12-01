@@ -32,6 +32,28 @@ module.exports.fileMd5ByStream = stream => {
   })
 }
 
+module.exports.combineFile = (target_path, source_paths) => {
+  return new Promise((resolve, reject) => {
+    const writer = FS.createWriteStream(target_path)
+    mergeStream(writer, source_paths, resolve, reject)
+  })
+}
+
+function mergeStream(writer, source_paths, resolve, reject) {
+  if (source_paths.length === 0) {
+    resolve()
+    return
+  }
+  const reader = FS.createReadStream(source_paths.shift())
+  reader.pipe(writer, { end: false })
+  reader.on('end', () => {
+    mergeStream(writer, source_paths, resolve, reject)
+  })
+  reader.on('error', err => {
+    reject(err)
+  })
+}
+
 module.exports.mkdir = dir_path => {
   if (FS.existsSync(dir_path)) {
     return

@@ -2,7 +2,7 @@
 
 ***Note:*** Get upload URL before upload.
 
-### Apply upload
+### * Apply upload
 
 > POST /api/v1/file/h5/upload/apply
 
@@ -34,25 +34,25 @@ curl \
     {
       "file_name": "key.zip",
       "file_type": "application/octet-stream",
-      "exist_file_cnt": 9,
+      "exist_file_cnt": 0,
       "chunks": [
         {
           "offset": 0,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/5/0"
+          "upload_url": "/api/v1/file/h5/upload/1/0"
         },
         {
           "offset": 1024,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/5/1024"
+          "upload_url": "/api/v1/file/h5/upload/1/1024"
         },
         {
           "offset": 2048,
           "chunk_size": 880,
-          "upload_url": "/api/v1/file/h5/upload/5/2048"
+          "upload_url": "/api/v1/file/h5/upload/1/2048"
         }
       ],
-      "id": 5
+      "id": 1
     },
     {
       "file_name": "10078755429403414264.pdf",
@@ -62,45 +62,45 @@ curl \
         {
           "offset": 0,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/6/0"
+          "upload_url": "/api/v1/file/h5/upload/2/0"
         },
         {
           "offset": 1024,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/6/1024"
+          "upload_url": "/api/v1/file/h5/upload/2/1024"
         },
         {
           "offset": 2048,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/6/2048"
+          "upload_url": "/api/v1/file/h5/upload/2/2048"
         },
         {
           "offset": 3072,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/6/3072"
+          "upload_url": "/api/v1/file/h5/upload/2/3072"
         },
         {
           "offset": 4096,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/6/4096"
+          "upload_url": "/api/v1/file/h5/upload/2/4096"
         },
         {
           "offset": 5120,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/6/5120"
+          "upload_url": "/api/v1/file/h5/upload/2/5120"
         },
         {
           "offset": 6144,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/6/6144"
+          "upload_url": "/api/v1/file/h5/upload/2/6144"
         },
         {
           "offset": 7168,
           "chunk_size": 180,
-          "upload_url": "/api/v1/file/h5/upload/6/7168"
+          "upload_url": "/api/v1/file/h5/upload/2/7168"
         }
       ],
-      "id": 6
+      "id": 2
     }
   ],
   "code": 200,
@@ -108,7 +108,7 @@ curl \
 }
 ```
 
-### File upload
+### * File upload
 
 > POST /api/v1/file/h5/upload/{id}/{offset}
 
@@ -131,20 +131,20 @@ ls /Users/huzhenjie/Downloads/key.zip.chunks.*
 curl \
   -X POST \
   -F 'file=@/Users/huzhenjie/Downloads/key.zip.chunks.aa' \
-  http://localhost:5233/api/v1/file/h5/upload/5/0
+  http://localhost:5233/api/v1/file/h5/upload/1/0
   
 curl \
   -X POST \
   -F 'file=@/Users/huzhenjie/Downloads/key.zip.chunks.ab' \
-  http://localhost:5233/api/v1/file/h5/upload/5/1024
+  http://localhost:5233/api/v1/file/h5/upload/1/1024
   
 curl \
   -X POST \
   -F 'file=@/Users/huzhenjie/Downloads/key.zip.chunks.ac' \
-  http://localhost:5233/api/v1/file/h5/upload/5/2048
+  http://localhost:5233/api/v1/file/h5/upload/1/2048
 ```
 
-### Combine upload
+### * Combine upload
 
 > POST /api/v1/file/h5/upload/{id}/combine
 
@@ -161,5 +161,15 @@ Shell
 ```shell
 curl \
   -X POST \
-  http://localhost:5233/api/v1/file/h5/upload/5/combine
+  http://localhost:5233/api/v1/file/h5/upload/1/combine
 ```
+
+#### Response for completed conclusion
+
+```json
+{
+  "code": 200,
+  "msg": "ok"
+}
+```
+

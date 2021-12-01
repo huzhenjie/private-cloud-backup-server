@@ -89,7 +89,7 @@ module.exports.update = async (table, model, where = '1=1', values = []) => {
           changedRows: 0
        }
      */
-    const { affectedRows } = await query(sql, [...paramValues, ...values])
+    const { affectedRows } = await module.exports.query(sql, [...paramValues, ...values])
     return affectedRows >= 1
 }
 

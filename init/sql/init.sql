@@ -25,6 +25,7 @@ file_name varchar(128) not null default '' comment '文件名称',
 file_type varchar(32) not null default '' comment '文件类型，如 image/jpg，image/png',
 file_time bigint unsigned not null default 0 comment '原文件创建时间',
 client_type tinyint unsigned not null default 0 comment '客户端类型，0：unknown，1：h5，2：android，3：ios，4：pc',
+origin_path varchar(255) not null default '' comment '客户端原路径',
 state tinyint unsigned not null default 0 comment '状态，0：未完成，1：已完成',
 create_time bigint unsigned not null default 0 comment '创建时间',
 primary key (id)
