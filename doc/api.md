@@ -143,3 +143,23 @@ curl \
   -F 'file=@/Users/huzhenjie/Downloads/key.zip.chunks.ac' \
   http://localhost:5233/api/v1/file/h5/upload/5/2048
 ```
+
+### Combine upload
+
+> POST /api/v1/file/h5/upload/{id}/combine
+
+#### Parameters
+
+Name | Type | In | Required | Description
+--- | --- | --- | --- | ---
+id | long | path | true | The id of the file, which is returned by the apply upload API
+
+#### Code samples
+
+Shell
+
+```shell
+curl \
+  -X POST \
+  http://localhost:5233/api/v1/file/h5/upload/5/combine
+```

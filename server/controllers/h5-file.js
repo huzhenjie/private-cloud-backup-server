@@ -18,7 +18,7 @@ module.exports.upload = async ctx => {
   ctx.body = {
     size: file.type,
     code: 200,
-    msg: '上传成功'
+    msg: 'upload success'
   }
 }
 
@@ -41,6 +41,13 @@ module.exports.h5UploadApply = async ctx => {
 
 module.exports.h5Upload = async ctx => {
   const { tmp_file_id, offset } = ctx.params
+  if (!ctx.request.files) {
+    ctx.body = {
+      code: 500,
+      msg: 'file required'
+    }
+    return
+  }
   const file = ctx.request.files.file
   try {
     await FileService.h5Upload(tmp_file_id, offset, file)
@@ -56,3 +63,18 @@ module.exports.h5Upload = async ctx => {
   }
 }
 
+module.exports.h5Combine = async ctx => {
+  const { tmp_file_id } = ctx.params
+  try {
+    await FileService.h5Combine(tmp_file_id)
+    ctx.body = {
+      code: 200,
+      msg: 'ok'
+    }
+  } catch (e) {
+    ctx.body = {
+      code: 500,
+      msg: e.message
+    }
+  }
+}
