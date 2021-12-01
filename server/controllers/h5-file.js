@@ -62,7 +62,7 @@ module.exports.h5Combine = async ctx => {
 module.exports.download = async ctx => {
   const { file_id } = ctx.params
   try {
-    const file = await FileService.getFile(file_id, 'server_path')
+    const file = await FileService.getFile(file_id, 'server_path,file_name')
     if (!file) {
       ctx.body = {
         code: 500,
@@ -70,6 +70,7 @@ module.exports.download = async ctx => {
       }
       return
     }
+    ctx.attachment(file.file_name)
     await Send(ctx, file.server_path, { root: '/'})
   } catch (e) {
     ctx.body = {
