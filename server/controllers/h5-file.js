@@ -11,6 +11,7 @@ module.exports.h5UploadApply = async ctx => {
       msg: 'ok'
     }
   } catch (e) {
+    console.error(e)
     ctx.body = {
       code: 500,
       msg: e.message
@@ -52,6 +53,7 @@ module.exports.h5Combine = async ctx => {
       msg: 'ok'
     }
   } catch (e) {
+    console.error(e)
     ctx.body = {
       code: 500,
       msg: e.message
@@ -73,6 +75,7 @@ module.exports.download = async ctx => {
     ctx.attachment(file.file_name)
     await Send(ctx, file.server_path, { root: '/'})
   } catch (e) {
+    console.error(e)
     ctx.body = {
       code: 500,
       msg: e.message
