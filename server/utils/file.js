@@ -1,5 +1,7 @@
 const Crypto = require('crypto')
 const FS = require('fs')
+const Config = require("../../config")
+const Util = require("../utils/index")
 
 module.exports.fileMd5 = filePath => {
   return new Promise((resolve, reject) => {
@@ -72,5 +74,29 @@ module.exports.fileSize = path => {
 module.exports.delFile = path => {
   if (FS.existsSync(path)) {
     FS.unlinkSync(path)
+  }
+}
+
+module.exports.getAbsServerPath = (dir, file_name) => {
+  module.exports.mkdir(dir)
+  let path = dir + file_name
+  if (!FS.existsSync(path)) {
+    return path
+  }
+  const index = file_name.lastIndexOf('.')
+  let name = file_name
+  let ext = ''
+  if (index > -1) {
+    ext = file_name.substring(index) // .jpg if file_name.jpg
+    name = file_name.substring(0, index) // file_name if file_name.jpg
+  }
+  let i = 0
+  while (true) {
+    path = dir + name + '_' + i + ext
+    if (FS.existsSync(path)) {
+      i++
+    } else {
+      return path
+    }
   }
 }

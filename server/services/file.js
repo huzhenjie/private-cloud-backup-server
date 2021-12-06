@@ -88,10 +88,10 @@ module.exports.h5Combine = async tmp_file_id => {
     throw new Error('file apply info not found')
   }
   const { state, file_name, file_size, file_md5, file_type, file_time, client_type, origin_path } = tmp_file
-  // if (state === TmpFileModel.STATE_OK) {
-  //   console.log('file already combine')
-  //   return
-  // }
+  if (state === TmpFileModel.STATE_OK) {
+    console.log('file already combine')
+    return
+  }
   const chunks = await TmpFileChunkModel.getChunksByTmpFileId(tmp_file_id, 'offset,chunk_size,server_path,state')
   if (chunks.length === 0) {
     throw new Error('chunks not found')
@@ -100,7 +100,8 @@ module.exports.h5Combine = async tmp_file_id => {
   if (chunk_not_all_ok) {
     throw new Error('chunks not all ok')
   }
-  const server_path = getAbsServerPath(file_name)
+  const dir = Config.path.source_path + 'file/' + Util.fmtDatetime(Date.now(), 'yyyyMMdd') + '/'
+  let server_path = FileUtil.getAbsServerPath(dir, file_name)
   const chunk_paths = chunks.map(item => item.server_path)
   await FileUtil.combineFile(server_path, chunk_paths)
   const curr_file_size = FileUtil.fileSize(server_path)
@@ -112,6 +113,13 @@ module.exports.h5Combine = async tmp_file_id => {
   if (file_md5 && md5 !== file_md5) {
     FileUtil.delFile(server_path)
     throw new Error('file md5 not match')
+  }
+  const exist_file = await FileModel.getFileByMd5(md5, 'server_path')
+  if (exist_file) {
+    if (FS.existsSync(exist_file.server_path)) {
+      FileUtil.delFile(server_path)
+      server_path = exist_file.server_path
+    }
   }
   await FileModel.addFile({
     file_size,
@@ -145,26 +153,4 @@ module.exports.download = async ctx => {
 
 module.exports.getFile = async (file_id, cols = '*') => {
   return await FileModel.getFile(file_id, cols)
-}
-
-function getAbsServerPath(file_name) {
-  const dir = Config.path.source_path + 'file/' + Util.fmtDatetime(Date.now(), 'yyyyMMdd') + '/'
-  FileUtil.mkdir(dir)
-  const index = file_name.lastIndexOf('.')
-  let name = file_name
-  let ext = ''
-  if (index > -1) {
-    ext = file_name.substring(index) // .jpg if file_name.jpg
-    name = file_name.substring(0, index) // file_name if file_name.jpg
-  }
-  let i = 0
-  while (true) {
-    const target_file_name = i === 0 ? file_name : name + '_' + i + ext
-    const path = dir + target_file_name
-    if (FS.existsSync(path)) {
-      i++
-    } else {
-      return path
-    }
-  }
 }

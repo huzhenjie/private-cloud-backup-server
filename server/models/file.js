@@ -12,6 +12,9 @@ const file = {
   async getFile(id, cols = '*') {
     return await DB.queryForObj(TABLE, cols, 'id=? and delete_time=0', [id])
   },
+  async getFileByMd5(md5, cols = '*') {
+    return await DB.queryForObj(TABLE, cols, 'md5=? and delete_time=0', [md5])
+  },
   async getFileListByFilter(filter, cols = '*', offset = 0, size = 10) {
     let { where, values } = DB.mapToDbParams(filter)
     where += ` AND delete_time = 0 order by create_time desc limit ?,?`
