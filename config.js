@@ -11,7 +11,7 @@ const config = {
     DATABASE: 'private_cloud'
   },
   file: {
-    chunk_size: 1024,
+    chunk_size: 1024 * 1024,
   },
   path: {
     source_path: Path.join(__dirname, './static/')

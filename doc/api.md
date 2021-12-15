@@ -8,11 +8,14 @@
 
 #### Parameters
 
-Name | Type | In | Required | Description
---- | --- | --- | --- | ---
-file_name | string | body | true | The name of the file
-file_type | string | body | true | The type of the file
-file_size | long | body | true | The size of the file
+| Name      | Type   | In   | Required | Description               |
+|-----------|--------|------|----------|---------------------------|
+| file_name | string | body | true     | The name of the file      |
+| file_type | string | body | true     | The type of the file      |
+| file_size | long   | body | true     | The size of the file      |
+| file_time | long   | body |          | The file time of the file |
+| width     | int    | body |          | The width of the file     |
+| height    | int    | body |          | The height of the file    |
 
 #### Code samples
 
@@ -114,11 +117,11 @@ curl \
 
 #### Parameters
 
-Name | Type | In | Required | Description
---- | --- | --- | --- | ---
-file | file | body | true | The file to be uploaded
-id | long | path | true | The id of the file, which is returned by the apply upload API
-offset | long | path | true | The offset of the file, which is returned by the apply upload API
+| Name   | Type | In   | Required | Description                                                       |
+|--------|------|------|----------|-------------------------------------------------------------------|
+| file   | file | body | true     | The file to be uploaded                                           |
+| id     | long | path | true     | The id of the file, which is returned by the apply upload API     |
+| offset | long | path | true     | The offset of the file, which is returned by the apply upload API |
 
 #### Code samples
 
@@ -150,9 +153,9 @@ curl \
 
 #### Parameters
 
-Name | Type | In | Required | Description
---- | --- | --- | --- | ---
-id | long | path | true | The id of the file, which is returned by the apply upload API
+| Name | Type | In   | Required | Description                                                   |
+|------|------|------|----------|---------------------------------------------------------------|
+| id   | long | path | true     | The id of the file, which is returned by the apply upload API |
 
 #### Code samples
 

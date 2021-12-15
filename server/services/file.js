@@ -1,22 +1,30 @@
 const FS = require("fs")
 const Config = require("../../config")
-const FileModel = require('../models/file')
+const BackupFileModel = require('../models/backup-file')
 const TmpFileModel = require('../models/tmp-file')
 const TmpFileChunkModel = require('../models/tmp-file-chunk')
 const FileUtil = require("../utils/file")
 const Util = require('../utils/index')
 
 module.exports.h5UploadApply = async file_info_list => {
-  return await Promise.all(file_info_list.map(async ({ file_name, file_type, file_size, file_time }) => {
-    const exist_file_cnt = await FileModel.getFileCntByFilter({file_name, file_type })
+  return await Promise.all(file_info_list.map(async ({ file_name, file_type, file_size, file_time, width, height }) => {
+    if (!file_size) {
+      return {
+        state: -1,
+        msg: 'file size is empty'
+      }
+    }
+    const exist_file_cnt = await BackupFileModel.getFileCntByFilter({file_name, file_type })
     const create_time = Date.now()
     const tmp_file_id = await TmpFileModel.addFile({
       file_size,
       file_name,
       file_type,
-      file_time,
       create_time,
-      client_type: FileModel.CLIENT_TYPE_H5
+      width: width || 0,
+      height: height || 0,
+      file_time: file_time || create_time,
+      client_type: BackupFileModel.CLIENT_TYPE_H5
     })
     const chunk_dir = Config.path.source_path + 'tmp/chunk/'
     FileUtil.mkdir(chunk_dir)
@@ -44,7 +52,8 @@ module.exports.h5UploadApply = async file_info_list => {
       file_type,
       exist_file_cnt,
       chunks,
-      id: tmp_file_id
+      id: tmp_file_id,
+      state: 1
     }
   }))
 }
@@ -82,12 +91,12 @@ module.exports.h5Upload = async (tmp_file_id, offset, file) => {
 module.exports.h5Combine = async tmp_file_id => {
   const tmp_file = await TmpFileModel.getFile(
     tmp_file_id,
-    'state,file_name,file_size,file_md5,file_type,file_time,client_type,origin_path'
+    'state,file_name,file_size,file_md5,file_type,file_time,client_type,origin_path,width,height'
   )
   if (!tmp_file) {
     throw new Error('file apply info not found')
   }
-  const { state, file_name, file_size, file_md5, file_type, file_time, client_type, origin_path } = tmp_file
+  const { state, file_name, file_size, file_md5, file_type, file_time, client_type, origin_path, width, height } = tmp_file
   if (state === TmpFileModel.STATE_OK) {
     console.log('file already combine')
     return
@@ -96,6 +105,7 @@ module.exports.h5Combine = async tmp_file_id => {
   if (chunks.length === 0) {
     throw new Error('chunks not found')
   }
+  console.log(chunks)
   const chunk_not_all_ok = chunks.some(chunk => chunk.state !== TmpFileChunkModel.STATE_OK)
   if (chunk_not_all_ok) {
     throw new Error('chunks not all ok')
@@ -114,14 +124,14 @@ module.exports.h5Combine = async tmp_file_id => {
     FileUtil.delFile(server_path)
     throw new Error('file md5 not match')
   }
-  const exist_file = await FileModel.getFileByMd5(md5, 'server_path')
+  const exist_file = await BackupFileModel.getFileByMd5(md5, 'server_path')
   if (exist_file) {
     if (FS.existsSync(exist_file.server_path)) {
       FileUtil.delFile(server_path)
       server_path = exist_file.server_path
     }
   }
-  await FileModel.addFile({
+  await BackupFileModel.addFile({
     file_size,
     file_name,
     file_type,
@@ -129,6 +139,8 @@ module.exports.h5Combine = async tmp_file_id => {
     client_type,
     origin_path,
     server_path,
+    width,
+    height,
     file_md5: md5,
     create_time: Date.now()
   })
@@ -144,7 +156,7 @@ module.exports.h5Combine = async tmp_file_id => {
 
 module.exports.download = async ctx => {
   const { file_id } = ctx.params
-  const file = await FileModel.getFile(file_id, 'server_path')
+  const file = await BackupFileModel.getFile(file_id, 'server_path')
   if (!file) {
     throw new Error('file not found')
   }
@@ -152,5 +164,5 @@ module.exports.download = async ctx => {
 }
 
 module.exports.getFile = async (file_id, cols = '*') => {
-  return await FileModel.getFile(file_id, cols)
+  return await BackupFileModel.getFile(file_id, cols)
 }

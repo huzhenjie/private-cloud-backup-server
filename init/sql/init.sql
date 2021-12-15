@@ -1,7 +1,7 @@
 create database private_cloud;
 use private_cloud;
 
-create table file (
+create table backup_file (
 id bigint unsigned not null auto_increment,
 file_size bigint unsigned not null default 0 comment '文件大小',
 file_md5 char(32) not null default '' comment '文件md5',
@@ -9,6 +9,8 @@ file_name varchar(128) not null default '' comment '文件名称',
 file_type varchar(32) not null default '' comment '文件类型，如 image/jpg，image/png',
 file_time bigint unsigned not null default 0 comment '原文件创建时间',
 client_type tinyint unsigned not null default 0 comment '客户端类型，0：unknown，1：h5，2：android，3：ios，4：pc',
+width int unsigned not null default 0 comment '图片宽度',
+height int unsigned not null default 0 comment '图片高度',
 server_path varchar(255) not null default '' comment '服务器存储路径',
 origin_path varchar(255) not null default '' comment '客户端原路径',
 thumb_path varchar(128) not null default '' comment '缩略图路径',
@@ -24,6 +26,8 @@ file_md5 char(32) not null default '' comment '文件md5',
 file_name varchar(128) not null default '' comment '文件名称',
 file_type varchar(32) not null default '' comment '文件类型，如 image/jpg，image/png',
 file_time bigint unsigned not null default 0 comment '原文件创建时间',
+width int unsigned not null default 0 comment '图片宽度',
+height int unsigned not null default 0 comment '图片高度',
 client_type tinyint unsigned not null default 0 comment '客户端类型，0：unknown，1：h5，2：android，3：ios，4：pc',
 origin_path varchar(255) not null default '' comment '客户端原路径',
 state tinyint unsigned not null default 0 comment '状态，0：未完成，1：已完成',
