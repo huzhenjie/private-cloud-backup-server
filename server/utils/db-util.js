@@ -11,7 +11,7 @@ const pool = mysql.createPool({
 })
 
 module.exports.query = async (sql, values) => {
-    console.debug(`[sql] ${sql}\n\t `, values)
+    console.debug(`\t ${sql}\n\t`, values)
 
     return new Promise((resolve, reject) => {
         pool.getConnection(function (err, connection) {
