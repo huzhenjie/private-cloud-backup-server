@@ -82,3 +82,15 @@ module.exports.download = async ctx => {
     }
   }
 }
+
+module.exports.getImgList = async ctx => {
+  const { last_id, last_file_time } = ctx.request.query
+  const last_id_num = last_id ? parseInt(last_id) : 0
+  const last_file_time_num = last_file_time ? parseInt(last_file_time) : 0
+  const data = await FileService.getImgList(last_id_num, last_file_time_num, 30)
+  ctx.body = {
+    data,
+    code: 200,
+    msg: 'ok'
+  }
+}

@@ -14,7 +14,7 @@ const tmp_file = {
     return await DB.update(TABLE, file, 'id=?', [id]);
   },
   async removeFile(id) {
-    return await DB.remove(TABLE, 'id=? limit 1', [id]);
+    return await DB.remove(TABLE, 'id=? LIMIT 1', [id]);
   }
 }
 

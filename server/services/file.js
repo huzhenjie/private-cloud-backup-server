@@ -105,7 +105,6 @@ module.exports.h5Combine = async tmp_file_id => {
   if (chunks.length === 0) {
     throw new Error('chunks not found')
   }
-  console.log(chunks)
   const chunk_not_all_ok = chunks.some(chunk => chunk.state !== TmpFileChunkModel.STATE_OK)
   if (chunk_not_all_ok) {
     throw new Error('chunks not all ok')
@@ -165,4 +164,30 @@ module.exports.download = async ctx => {
 
 module.exports.getFile = async (file_id, cols = '*') => {
   return await BackupFileModel.getFile(file_id, cols)
+}
+
+module.exports.getImgList = async (last_id, last_file_time, size = 10) => {
+  const file_list = await BackupFileModel.getImgList(last_file_time, 'id,file_size,file_md5,file_name,file_type,file_time,client_type,width,height,create_time', size * 2)
+  const res_list = []
+  for (let file of file_list) {
+    if (file.id === last_id && res_list.length > 0) {
+      res_list.splice(0, res_list.length)
+      continue
+    }
+    file.file_url = `/api/v1/file/h5/file/${file.id}`
+    res_list.push(file)
+    if (res_list.length === size) {
+      break
+    }
+  }
+  if (res_list.length > 0) {
+    const { id, file_time } = res_list[res_list.length - 1]
+    last_id = id
+    last_file_time = file_time
+  }
+  return {
+    last_id,
+    last_file_time,
+    items: res_list
+  }
 }

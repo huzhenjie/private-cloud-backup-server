@@ -3,6 +3,13 @@ const FS = require('fs')
 const Config = require("../../config")
 const Util = require("../utils/index")
 
+module.exports.imgFileTypes = Object.freeze([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif'
+])
+
 module.exports.fileMd5 = filePath => {
   return new Promise((resolve, reject) => {
     const hash = Crypto.createHash('md5')

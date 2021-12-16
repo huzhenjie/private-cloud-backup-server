@@ -176,3 +176,64 @@ curl \
 }
 ```
 
+### * Get image list
+
+> [GET] /api/v1/file/h5/img
+
+#### Parameters
+
+| Name          | Type | In    | Required | Description                                                           |
+|---------------|------|-------|----------|-----------------------------------------------------------------------|
+| last_id       | long | query | false    | The last id of the image list, which is returned by the current API   |
+| last_img_time | long | query | false    | The last time of the image list, which is returned by the current API |
+
+#### Code samples
+
+Shell
+
+```shell
+curl \
+  -X GET \
+  'http://localhost:5233/api/v1/file/h5/img?last_id=0&last_img_time=0'
+```
+
+#### Response for completed conclusion
+
+```json
+{
+  "data": {
+    "last_id": 1,
+    "last_file_time": 1638957519507,
+    "items": [
+      {
+        "id": 2,
+        "file_size": 216096,
+        "file_md5": "a37eb92184a568455c0643e78bd78f36",
+        "file_name": "ile_Doc_0_Page_0.png",
+        "file_type": "image/png",
+        "file_time": 1638957519507,
+        "client_type": 1,
+        "width": 1587,
+        "height": 1058,
+        "create_time": 1639617417932,
+        "file_url": "/api/v1/file/h5/file/2"
+      },
+      {
+        "id": 1,
+        "file_size": 216096,
+        "file_md5": "a37eb92184a568455c0643e78bd78f36",
+        "file_name": "ile_Doc_0_Page_0.png",
+        "file_type": "image/png",
+        "file_time": 1638957519507,
+        "client_type": 1,
+        "width": 1587,
+        "height": 1058,
+        "create_time": 1639583478225,
+        "file_url": "/api/v1/file/h5/file/1"
+      }
+    ]
+  },
+  "code": 200,
+  "msg": "ok"
+}
+```

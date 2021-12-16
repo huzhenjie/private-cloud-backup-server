@@ -14,13 +14,13 @@ const tmp_file = {
     return await DB.queryForObj(TABLE, cols, 'tmp_file_id=? AND offset=?', [tmp_file_id, offset]);
   },
   async updateChunk(id, chunk) {
-    return await DB.update(TABLE, chunk, 'id=? limit 1', [id]);
+    return await DB.update(TABLE, chunk, 'id=? LIMIT 1', [id]);
   },
   async getChunksByTmpFileId(tmp_file_id, cols = '*') {
-    return await DB.queryForList(TABLE, cols, 'tmp_file_id=? order by offset asc', [tmp_file_id]);
+    return await DB.queryForList(TABLE, cols, 'tmp_file_id=? ORDER BY offset ASC', [tmp_file_id]);
   },
   async removeChunks(tmp_file_id) {
-    return await DB.remove(TABLE, 'tmp_file_id=? limit 1', [tmp_file_id]);
+    return await DB.remove(TABLE, 'tmp_file_id=? LIMIT 1', [tmp_file_id]);
   }
 }
 
