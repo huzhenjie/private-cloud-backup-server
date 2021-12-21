@@ -1,8 +1,8 @@
 const Router = require('koa-router')()
 const DefaultController = require('../controllers')
-const FileRouter = require('./file')
+const H5Router = require('./h5')
 
 Router.all('/test', DefaultController.test)
-Router.use('/api/v1/file', FileRouter.routes(), FileRouter.allowedMethods())
+Router.use('/api/v1/h5', H5Router.routes(), H5Router.allowedMethods())
 
 module.exports = Router

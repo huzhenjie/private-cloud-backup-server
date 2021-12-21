@@ -4,7 +4,7 @@
 
 ### * Apply upload
 
-> POST /api/v1/file/h5/upload/apply
+> POST /api/v1/h5/upload/apply
 
 #### Parameters
 
@@ -25,7 +25,7 @@ Shell
 curl \
   -X POST \
   -H 'Content-Type: application/json' \
-  http://localhost:5233/api/v1/file/h5/upload/apply \
+  http://localhost:5233/api/v1/h5/upload/apply \
   -d '[{"file_name":"key.zip","file_type":"application/octet-stream","file_size":2928},{"file_name":"10078755429403414264.pdf","file_type":"application/octet-stream","file_size":7348}]'
 ```
 
@@ -42,17 +42,17 @@ curl \
         {
           "offset": 0,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/1/0"
+          "upload_url": "/api/v1/h5/upload/1/0"
         },
         {
           "offset": 1024,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/1/1024"
+          "upload_url": "/api/v1/h5/upload/1/1024"
         },
         {
           "offset": 2048,
           "chunk_size": 880,
-          "upload_url": "/api/v1/file/h5/upload/1/2048"
+          "upload_url": "/api/v1/h5/upload/1/2048"
         }
       ],
       "id": 1
@@ -65,42 +65,42 @@ curl \
         {
           "offset": 0,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/2/0"
+          "upload_url": "/api/v1/h5/upload/2/0"
         },
         {
           "offset": 1024,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/2/1024"
+          "upload_url": "/api/v1/h5/upload/2/1024"
         },
         {
           "offset": 2048,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/2/2048"
+          "upload_url": "/api/v1/h5/upload/2/2048"
         },
         {
           "offset": 3072,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/2/3072"
+          "upload_url": "/api/v1/h5/upload/2/3072"
         },
         {
           "offset": 4096,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/2/4096"
+          "upload_url": "/api/v1/h5/upload/2/4096"
         },
         {
           "offset": 5120,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/2/5120"
+          "upload_url": "/api/v1/h5/upload/2/5120"
         },
         {
           "offset": 6144,
           "chunk_size": 1024,
-          "upload_url": "/api/v1/file/h5/upload/2/6144"
+          "upload_url": "/api/v1/h5/upload/2/6144"
         },
         {
           "offset": 7168,
           "chunk_size": 180,
-          "upload_url": "/api/v1/file/h5/upload/2/7168"
+          "upload_url": "/api/v1/h5/upload/2/7168"
         }
       ],
       "id": 2
@@ -113,7 +113,7 @@ curl \
 
 ### * File upload
 
-> POST /api/v1/file/h5/upload/{id}/{offset}
+> POST /api/v1/h5/upload/{id}/{offset}
 
 #### Parameters
 
@@ -134,22 +134,22 @@ ls /Users/huzhenjie/Downloads/key.zip.chunks.*
 curl \
   -X POST \
   -F 'file=@/Users/huzhenjie/Downloads/key.zip.chunks.aa' \
-  http://localhost:5233/api/v1/file/h5/upload/1/0
+  http://localhost:5233/api/v1/h5/upload/1/0
   
 curl \
   -X POST \
   -F 'file=@/Users/huzhenjie/Downloads/key.zip.chunks.ab' \
-  http://localhost:5233/api/v1/file/h5/upload/1/1024
+  http://localhost:5233/api/v1/h5/upload/1/1024
   
 curl \
   -X POST \
   -F 'file=@/Users/huzhenjie/Downloads/key.zip.chunks.ac' \
-  http://localhost:5233/api/v1/file/h5/upload/1/2048
+  http://localhost:5233/api/v1/h5/upload/1/2048
 ```
 
 ### * Combine upload
 
-> POST /api/v1/file/h5/upload/{id}/combine
+> POST /api/v1/h5/upload/{id}/combine
 
 #### Parameters
 
@@ -164,7 +164,7 @@ Shell
 ```shell
 curl \
   -X POST \
-  http://localhost:5233/api/v1/file/h5/upload/1/combine
+  http://localhost:5233/api/v1/h5/upload/1/combine
 ```
 
 #### Response for completed conclusion
@@ -178,7 +178,7 @@ curl \
 
 ### * Get image list
 
-> [GET] /api/v1/file/h5/img
+> [GET] /api/v1/h5/img
 
 #### Parameters
 
@@ -194,7 +194,7 @@ Shell
 ```shell
 curl \
   -X GET \
-  'http://localhost:5233/api/v1/file/h5/img?last_id=0&last_img_time=0'
+  'http://localhost:5233/api/v1/h5/img?last_id=0&last_img_time=0'
 ```
 
 #### Response for completed conclusion
@@ -216,7 +216,7 @@ curl \
         "width": 1587,
         "height": 1058,
         "create_time": 1639617417932,
-        "file_url": "/api/v1/file/h5/file/2"
+        "file_url": "/api/v1/h5/file/2"
       },
       {
         "id": 1,
@@ -229,7 +229,7 @@ curl \
         "width": 1587,
         "height": 1058,
         "create_time": 1639583478225,
-        "file_url": "/api/v1/file/h5/file/1"
+        "file_url": "/api/v1/h5/file/1"
       }
     ]
   },

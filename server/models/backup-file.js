@@ -13,6 +13,9 @@ const backup_file = {
   async getFile(id, cols = '*') {
     return await DB.queryForObj(TABLE, cols, 'id=? AND delete_time=0', [id])
   },
+  async delFile(id) {
+    return await DB.update(TABLE, { delete_time: Date.now() }, 'id=? LIMIT 1', [id])
+  },
   async getFileByMd5(md5, cols = '*') {
     return await DB.queryForObj(TABLE, cols, 'file_md5=? AND delete_time=0', [md5])
   },

@@ -83,6 +83,15 @@ module.exports.download = async ctx => {
   }
 }
 
+module.exports.delFile = async ctx => {
+  const { file_id } = ctx.params
+  await FileService.delFile(file_id)
+  ctx.body = {
+    code: 200,
+    msg: 'ok'
+  }
+}
+
 module.exports.getImgList = async ctx => {
   const { last_id, last_file_time } = ctx.request.query
   const last_id_num = last_id ? parseInt(last_id) : 0

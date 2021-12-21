@@ -43,7 +43,7 @@ module.exports.h5UploadApply = async file_info_list => {
       chunks.push({
         offset,
         chunk_size,
-        upload_url: `/api/v1/file/h5/upload/${tmp_file_id}/${offset}`
+        upload_url: `/api/v1/h5/upload/${tmp_file_id}/${offset}`
       })
       offset += Config.file.chunk_size
     }
@@ -166,6 +166,10 @@ module.exports.getFile = async (file_id, cols = '*') => {
   return await BackupFileModel.getFile(file_id, cols)
 }
 
+module.exports.delFile = async file_id => {
+  return await BackupFileModel.delFile(file_id)
+}
+
 module.exports.getImgList = async (last_id, last_file_time, size = 10) => {
   const file_list = await BackupFileModel.getImgList(last_file_time, 'id,file_size,file_md5,file_name,file_type,file_time,client_type,width,height,create_time', size * 2)
   const res_list = []
@@ -174,7 +178,7 @@ module.exports.getImgList = async (last_id, last_file_time, size = 10) => {
       res_list.splice(0, res_list.length)
       continue
     }
-    file.file_url = `/api/v1/file/h5/file/${file.id}`
+    file.file_url = `/api/v1/h5/file/${file.id}`
     res_list.push(file)
     if (res_list.length === size) {
       break
