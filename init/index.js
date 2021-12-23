@@ -7,6 +7,7 @@ const KoaCors = require('koa2-cors')
 const Util = require('../server/utils')
 const Router = require('../server/routers')
 const Config = require('../config')
+const Schedule = require('../server/schedules')
 
 const App = new Koa()
 App.use(KoaLogger())
@@ -26,3 +27,4 @@ const server_ip = Util.getIPAddress()
 if (server_ip) {
   console.log(`- Network:\thttp://${server_ip}:${SERVER_PORT}`)
 }
+Schedule.init()

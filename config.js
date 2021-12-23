@@ -12,6 +12,7 @@ const config = {
   },
   file: {
     chunk_size: 1024 * 1024,
+    trash_time: 3600000 * 24 * 7
   },
   path: {
     source_path: Path.join(__dirname, './static/')

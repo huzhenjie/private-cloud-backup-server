@@ -16,6 +16,9 @@ const backup_file = {
   async delFile(id) {
     return await DB.update(TABLE, { delete_time: Date.now() }, 'id=? LIMIT 1', [id])
   },
+  async removeFile(id) {
+    return await DB.remove(TABLE, 'id=? LIMIT 1', [id])
+  },
   async getFileByMd5(md5, cols = '*') {
     return await DB.queryForObj(TABLE, cols, 'file_md5=? AND delete_time=0', [md5])
   },
@@ -47,6 +50,10 @@ const backup_file = {
     where += 'AND delete_time=0 ORDER BY file_time DESC, id DESC LIMIT ?'
     values.push(size)
     return await DB.queryForList(TABLE, cols, where, values)
+  },
+  async getDeletedFileList(cols, trash_time, id = 0, size = 10) {
+    const where = 'id>? AND delete_time > 0 AND delete_time<=? ORDER BY id LIMIT ?'
+    return await DB.queryForList(TABLE, cols, where, [id, trash_time, size])
   }
 }
 

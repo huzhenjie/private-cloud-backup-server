@@ -171,7 +171,10 @@ module.exports.delFile = async file_id => {
 }
 
 module.exports.getImgList = async (last_id, last_file_time, size = 10) => {
-  const file_list = await BackupFileModel.getImgList(last_file_time, 'id,file_size,file_md5,file_name,file_type,file_time,client_type,width,height,create_time', size * 2)
+  const file_list = await BackupFileModel.getImgList(
+    last_file_time,
+    'id,file_size,file_md5,file_name,file_type,file_time,client_type,width,height,create_time',
+    size * 2)
   const res_list = []
   for (let file of file_list) {
     if (file.id === last_id && res_list.length > 0) {
@@ -193,5 +196,27 @@ module.exports.getImgList = async (last_id, last_file_time, size = 10) => {
     last_id,
     last_file_time,
     items: res_list
+  }
+}
+
+module.exports.clearTrash = async () => {
+  const trash_time = Date.now() - Config.file.trash_time
+  let last_id = 0
+  const size = 30
+  while (true) {
+    const files = await BackupFileModel.getDeletedFileList('id,file_md5, server_path', trash_time, last_id, size)
+    for (const { id, file_md5, server_path } of files) {
+      if (id > last_id) {
+        last_id = id
+      }
+      const exist_file = await BackupFileModel.getFileByMd5(file_md5, 'id')
+      if (!exist_file) {
+        FileUtil.delFile(server_path)
+      }
+      await BackupFileModel.removeFile(id)
+    }
+    if (files.length < size) {
+      break
+    }
   }
 }

@@ -95,7 +95,7 @@ module.exports.update = async (table, model, where = '1=1', values = []) => {
 
 module.exports.remove = async (table, where = '1=1', values = []) => {
     const sql = `DELETE FROM ${table} WHERE ${where}`
-    const {affectedRows} = await module.exports.query(sql, values)
+    const { affectedRows } = await module.exports.query(sql, values)
     return affectedRows >= 1
 }
 
