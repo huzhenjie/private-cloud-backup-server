@@ -1,8 +1,45 @@
-## H5
+# API for H5
 
-***Note:*** Get upload URL before upload.
+## User Guide
+
+### * Register
+
+> POST /api/v1/h5/account
+
+#### Parameters
+
+| Name     | Type   | In   | Required | Description |
+|----------|--------|------|----------|-------------|
+| username | string | body | Yes      | Username    |
+| pwd      | string | body | Yes      | Password    |
+| nick     | string | body | Yes      | Nick name   |
+
+#### Code samples
+
+Shell
+
+```shell
+curl \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  http://localhost:5233/api/v1/h5/account \
+  -d '{"username":"admin","pwd":"admin","nick":"admin"}'
+```
+
+#### Response for completed conclusion
+
+```json
+{
+  "code": 200,
+  "msg": "ok"
+}
+```
+
+## Backup Guide
 
 ### * Apply upload
+
+***Note:*** Get upload URL before upload.
 
 > POST /api/v1/h5/upload/apply
 

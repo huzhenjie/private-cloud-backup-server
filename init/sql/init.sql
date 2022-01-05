@@ -1,6 +1,20 @@
 create database private_cloud;
 use private_cloud;
 
+create table client_account (
+  id int(11) not null auto_increment,
+  uid char(16) not null comment 'user ',
+  username varchar(128) not null comment 'username',
+  pwd char(32) not null comment 'Password',
+  salt char(8) not null comment 'Salt for password',
+  nick varchar(64) not null comment 'Nickname',
+  create_time bigint unsigned not null default 0 comment 'Create Time',
+  update_time bigint unsigned not null default 0 comment 'Update Time',
+  unique key (uid),
+  unique key (username),
+  primary key (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 comment 'Account For Client';
+
 create table backup_file (
 id bigint unsigned not null auto_increment,
 file_size bigint unsigned not null default 0 comment '文件大小',

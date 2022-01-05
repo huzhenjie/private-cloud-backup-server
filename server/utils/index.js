@@ -1,4 +1,5 @@
 const OS = require('os')
+const Crypto = require('crypto')
 
 module.exports.getIPAddress = () => {
   const interfaces = OS.networkInterfaces();
@@ -50,4 +51,18 @@ module.exports.fmtDatetime = (ts, fmt) => {
   if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
   for (const k in o) { if (new RegExp('(' + k + ')').test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length))) }
   return fmt
+}
+
+module.exports.randomStr = len => {
+  const char_holder = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'
+  const max_pos = char_holder.length
+  let random_str = ''
+  for (let i = 0; i < len; i++) {
+    random_str += char_holder.charAt(Math.floor(Math.random() * max_pos))
+  }
+  return random_str
+}
+
+module.exports.md5 = (str, salt) => {
+  return Crypto.createHash('md5').update(str + salt).digest('hex')
 }
