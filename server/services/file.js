@@ -109,7 +109,8 @@ module.exports.h5Combine = async tmp_file_id => {
   if (chunk_not_all_ok) {
     throw new Error('chunks not all ok')
   }
-  const dir = Config.path.source_path + 'file/' + Util.fmtDatetime(Date.now(), 'yyyyMMdd') + '/'
+  const dir_name_for_file_type = FileUtil.getFileTypeStr(tmp_file.file_type)
+  const dir = Config.path.source_path + 'public/' + dir_name_for_file_type +'/'
   let server_path = FileUtil.getAbsServerPath(dir, file_name)
   const chunk_paths = chunks.map(item => item.server_path)
   await FileUtil.combineFile(server_path, chunk_paths)
