@@ -10,6 +10,18 @@ module.exports.imgFileTypes = Object.freeze([
   'image/gif'
 ])
 
+module.exports.getFileTypeStr = file_type => {
+  if (file_type.startsWith('image/')) {
+    return 'image'
+  } else if (file_type.startsWith('video/')) {
+    return 'video'
+  } else if (file_type.startsWith('audio/')) {
+    return 'audio'
+  } else {
+    return 'other'
+  }
+}
+
 module.exports.fileMd5 = filePath => {
   return new Promise((resolve, reject) => {
     const hash = Crypto.createHash('md5')
@@ -54,13 +66,13 @@ function mergeStream(writer, source_paths, resolve, reject) {
     return
   }
   const reader = FS.createReadStream(source_paths.shift())
-  reader.pipe(writer, { end: false })
   reader.on('end', () => {
     mergeStream(writer, source_paths, resolve, reject)
   })
   reader.on('error', err => {
     reject(err)
   })
+  reader.pipe(writer, { end: false })
 }
 
 module.exports.mkdir = dir_path => {
