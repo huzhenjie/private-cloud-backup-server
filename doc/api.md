@@ -35,6 +35,52 @@ curl \
 }
 ```
 
+### * Login
+
+> POST /api/v1/h5/login
+
+#### Parameters
+
+
+| Name      | Type   | In   | Required | Description               |
+|-----------|--------|------|----------|---------------------------|
+| username  | string | body | Yes      | Username                  |
+| pwd       | string | body | Yes      | Password                  |
+
+#### Code samples
+
+Shell
+
+```shell
+curl \
+ -X POST \
+ -H 'Content-Type: application/json' \
+  http://localhost:5233/api/v1/h5/login \
+  -d '{"username":"admin","pwd":"admin"}'
+````
+
+#### Response for completed conclusion
+
+```json
+{
+  "data": {
+    "account_info": {
+      "username": "admin",
+      "nick": "admin"
+    },
+    "token_info": {
+      "uid": "TaAhn2dYnC4yQ3BA",
+      "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJUYUFobjJkWW5DNHlRM0JBIiwiY3JlYXRlX3RpbWUiOjE2NDE4OTM2NTUwOTEsImlhdCI6MTY0MTg5MzY1NSwiZXhwIjoxNjQxOTgwMDU1fQ.XH_yOPNv5jKfEpIi097l8O6TbPVG_nkOuPAmxGNIwgk",
+      "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJUYUFobjJkWW5DNHlRM0JBIiwiY3JlYXRlX3RpbWUiOjE2NDE4OTM2NTUwOTEsImlhdCI6MTY0MTg5MzY1NSwiZXhwIjoxNjQ0NDg1NjU1fQ.6Lxc3cajvCMko-IQOUkT9KYhZLNqF52mWhQC2rBnQy4",
+      "access_token_expire_in": 86400000,
+      "refresh_token_expire_in": 2592000000
+    }
+  },
+  "code": 200,
+  "msg": "ok"
+}
+```
+
 ## Backup Guide
 
 ### * Apply upload

@@ -1,5 +1,23 @@
 const UserService = require('../services/user')
 
+module.exports.login = async ctx => {
+  const { username, pwd } = ctx.request.body
+  try {
+    const data = await UserService.login(username, pwd)
+    ctx.body = {
+      data,
+      code: 200,
+      msg: 'ok'
+    }
+  } catch (e) {
+    ctx.body = {
+      code: 500,
+      msg: e.message
+    }
+  }
+
+}
+
 module.exports.register = async ctx => {
   const { username, pwd, nick } = ctx.request.body
 

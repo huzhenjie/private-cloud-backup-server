@@ -7,6 +7,7 @@ const routers = Router
   .get(`/file/:file_id`, H5FileController.download)
   .delete(`/file/:file_id`, H5FileController.delFile)
   .get(`/img`, H5FileController.getImgList)
+  .post(`/login`, UserController.login)
   .post(`/account`, UserController.register)
   .post(`/upload/apply`, H5FileController.h5UploadApply)
   .post(`/upload/:tmp_file_id/combine`, KoaBody, H5FileController.h5Combine)
