@@ -7,8 +7,9 @@ const tmp_file = {
   async addFile(file) {
     return await DB.insertGetId(TABLE, file);
   },
-  async getFile(id, cols = '*') {
-    return await DB.queryForObj(TABLE, cols, 'id=?', [id]);
+  async getFileByFilter(filter, cols = '*') {
+    let { where, values } = DB.mapToDbParams(filter)
+    return await DB.queryForObj(TABLE, cols, where, values);
   },
   async updateFile(id, file) {
     return await DB.update(TABLE, file, 'id=?', [id]);

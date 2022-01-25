@@ -10,6 +10,12 @@ const config = {
     PASSWORD: '',
     DATABASE: 'private_cloud'
   },
+  redis: {
+    PORT: 6379,
+    HOST: '127.0.0.1',
+    PASSWORD: '3y3IQezN',
+    PREFIX: 'PC'
+  },
   file: {
     chunk_size: 1024 * 1024,
     trash_time: 3600000 * 24 * 7

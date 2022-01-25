@@ -69,11 +69,11 @@ curl \
       "nick": "admin"
     },
     "token_info": {
-      "uid": "TaAhn2dYnC4yQ3BA",
-      "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJUYUFobjJkWW5DNHlRM0JBIiwiY3JlYXRlX3RpbWUiOjE2NDE4OTM2NTUwOTEsImlhdCI6MTY0MTg5MzY1NSwiZXhwIjoxNjQxOTgwMDU1fQ.XH_yOPNv5jKfEpIi097l8O6TbPVG_nkOuPAmxGNIwgk",
-      "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJUYUFobjJkWW5DNHlRM0JBIiwiY3JlYXRlX3RpbWUiOjE2NDE4OTM2NTUwOTEsImlhdCI6MTY0MTg5MzY1NSwiZXhwIjoxNjQ0NDg1NjU1fQ.6Lxc3cajvCMko-IQOUkT9KYhZLNqF52mWhQC2rBnQy4",
-      "access_token_expire_in": 86400000,
-      "refresh_token_expire_in": 2592000000
+      "uid": "7WS4WePcStHEGFif",
+      "access_token": "YGDiG65n_6ctJBZZ4MF4CYff6J6JF3rBRhAAPcSik",
+      "refresh_token": "YGDiG65n_xyhEKmHbspDx4cwTem735AyXjZpWeTkQ",
+      "access_token_expire_in": 86400,
+      "refresh_token_expire_in": 2592000
     }
   },
   "code": 200,
@@ -91,14 +91,16 @@ curl \
 
 #### Parameters
 
-| Name      | Type   | In   | Required | Description               |
-|-----------|--------|------|----------|---------------------------|
-| file_name | string | body | true     | The name of the file      |
-| file_type | string | body | true     | The type of the file      |
-| file_size | long   | body | true     | The size of the file      |
-| file_time | long   | body |          | The file time of the file |
-| width     | int    | body |          | The width of the file     |
-| height    | int    | body |          | The height of the file    |
+| Name          | Type   | In     | Required | Description               |
+|---------------|--------|--------|----------|---------------------------|
+| x-uid         | string | header | true     | UID                       |
+| authorization | string | header | true     | Token                     |
+| file_name     | string | body   | true     | The name of the file      |
+| file_type     | string | body   | true     | The type of the file      |
+| file_size     | long   | body   | true     | The size of the file      |
+| file_time     | long   | body   |          | The file time of the file |
+| width         | int    | body   |          | The width of the file     |
+| height        | int    | body   |          | The height of the file    |
 
 #### Code samples
 
@@ -108,6 +110,8 @@ Shell
 curl \
   -X POST \
   -H 'Content-Type: application/json' \
+  -H 'x-uid: 7WS4WePcStHEGFif' \
+  -H 'authorization: YGDiG65n_6ctJBZZ4MF4CYff6J6JF3rBRhAAPcSik' \
   http://localhost:5233/api/v1/h5/upload/apply \
   -d '[{"file_name":"key.zip","file_type":"application/octet-stream","file_size":2928},{"file_name":"10078755429403414264.pdf","file_type":"application/octet-stream","file_size":7348}]'
 ```
@@ -277,6 +281,8 @@ Shell
 ```shell
 curl \
   -X GET \
+  -H 'x-uid: 7WS4WePcStHEGFif' \
+  -H 'authorization: 2t2Ky8C7_TYXiDJG7aE6rrW2TPPXwSxANcA8F7MGh' \
   'http://localhost:5233/api/v1/h5/img?last_id=0&last_img_time=0'
 ```
 

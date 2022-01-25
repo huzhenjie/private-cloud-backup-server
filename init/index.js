@@ -8,12 +8,14 @@ const Util = require('../server/utils')
 const Router = require('../server/routers')
 const Config = require('../config')
 const Schedule = require('../server/schedules')
+const H5Auth = require('../server/routers/middleware/h5-auth')
 
 const App = new Koa()
 App.use(KoaLogger())
 App.use(BodyParser())
 App.use(KoaCors())
 App.use(KoaStatic(Path.join(__dirname, '../static/')))
+App.use(H5Auth)
 App.use(Router.routes()).use(Router.allowedMethods())
 App.use(async (ctx) => {
   ctx.status = 404;

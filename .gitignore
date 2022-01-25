@@ -9,7 +9,7 @@
 node_modules
 .DS_Store
 static/tmp
-static/public
+static/data
 static/file
 
 .env.local

@@ -1,12 +1,14 @@
 const FS = require("fs")
 const Config = require("../../config")
+const ClientAccountModel = require("../models/client-account")
 const BackupFileModel = require('../models/backup-file')
 const TmpFileModel = require('../models/tmp-file')
 const TmpFileChunkModel = require('../models/tmp-file-chunk')
 const FileUtil = require("../utils/file")
 const Util = require('../utils/index')
+const JWT = require('../utils/jwt')
 
-module.exports.h5UploadApply = async file_info_list => {
+module.exports.h5UploadApply = async (uid, file_info_list) => {
   return await Promise.all(file_info_list.map(async ({ file_name, file_type, file_size, file_time, width, height }) => {
     if (!file_size) {
       return {
@@ -14,9 +16,10 @@ module.exports.h5UploadApply = async file_info_list => {
         msg: 'file size is empty'
       }
     }
-    const exist_file_cnt = await BackupFileModel.getFileCntByFilter({file_name, file_type })
+    const exist_file_cnt = await BackupFileModel.getFileCntByFilter({ uid, file_name, file_type })
     const create_time = Date.now()
     const tmp_file_id = await TmpFileModel.addFile({
+      uid,
       file_size,
       file_name,
       file_type,
@@ -34,6 +37,7 @@ module.exports.h5UploadApply = async file_info_list => {
       const chunk_size = Math.min(Config.file.chunk_size, file_size - offset)
       const server_path = chunk_dir + Math.random().toString(36).slice(-10)
       await TmpFileChunkModel.addChunk({
+        uid,
         tmp_file_id,
         offset,
         chunk_size,
@@ -58,11 +62,14 @@ module.exports.h5UploadApply = async file_info_list => {
   }))
 }
 
-module.exports.h5Upload = async (tmp_file_id, offset, file) => {
+module.exports.h5Upload = async (uid, tmp_file_id, offset, file) => {
   if (!file) {
     throw new Error('file is required')
   }
-  const tmp_file = await TmpFileModel.getFile(tmp_file_id, 'state')
+  const tmp_file = await TmpFileModel.getFileByFilter({
+    uid,
+    id: tmp_file_id
+  }, 'state')
   if (!tmp_file) {
     throw new Error('file apply info not found')
   }
@@ -88,15 +95,29 @@ module.exports.h5Upload = async (tmp_file_id, offset, file) => {
   })
 }
 
-module.exports.h5Combine = async tmp_file_id => {
-  const tmp_file = await TmpFileModel.getFile(
-    tmp_file_id,
+module.exports.h5Combine = async (uid, tmp_file_id) => {
+  const tmp_file = await TmpFileModel.getFileByFilter(
+    {
+      uid,
+      id: tmp_file_id
+    },
     'state,file_name,file_size,file_md5,file_type,file_time,client_type,origin_path,width,height'
   )
   if (!tmp_file) {
     throw new Error('file apply info not found')
   }
-  const { state, file_name, file_size, file_md5, file_type, file_time, client_type, origin_path, width, height } = tmp_file
+  const {
+    state,
+    file_name,
+    file_size,
+    file_md5,
+    file_type,
+    file_time,
+    client_type,
+    origin_path,
+    width,
+    height
+  } = tmp_file
   if (state === TmpFileModel.STATE_OK) {
     console.log('file already combine')
     return
@@ -110,7 +131,7 @@ module.exports.h5Combine = async tmp_file_id => {
     throw new Error('chunks not all ok')
   }
   const dir_name_for_file_type = FileUtil.getFileTypeStr(tmp_file.file_type)
-  const dir = Config.path.source_path + 'public/' + dir_name_for_file_type +'/'
+  const dir = Config.path.source_path + 'data/' + uid + '/public/' + dir_name_for_file_type + '/'
   let server_path = FileUtil.getAbsServerPath(dir, file_name)
   const chunk_paths = chunks.map(item => item.server_path)
   await FileUtil.combineFile(server_path, chunk_paths)
@@ -124,7 +145,7 @@ module.exports.h5Combine = async tmp_file_id => {
     FileUtil.delFile(server_path)
     throw new Error('file md5 not match')
   }
-  const exist_file = await BackupFileModel.getFileByMd5(md5, 'server_path')
+  const exist_file = await BackupFileModel.getFileByFilter({ uid, file_md5: md5 }, 'server_path')
   if (exist_file) {
     if (FS.existsSync(exist_file.server_path)) {
       FileUtil.delFile(server_path)
@@ -132,6 +153,7 @@ module.exports.h5Combine = async tmp_file_id => {
     }
   }
   await BackupFileModel.addFile({
+    uid,
     file_size,
     file_name,
     file_type,
@@ -156,33 +178,61 @@ module.exports.h5Combine = async tmp_file_id => {
 
 module.exports.download = async ctx => {
   const { file_id } = ctx.params
-  const file = await BackupFileModel.getFile(file_id, 'server_path')
+  const file = await BackupFileModel.getFileByFilter({
+    id: file_id
+  }, 'server_path')
   if (!file) {
     throw new Error('file not found')
   }
   ctx.attachment(file.server_path)
 }
 
-module.exports.getFile = async (file_id, cols = '*') => {
-  return await BackupFileModel.getFile(file_id, cols)
+module.exports.getFile = async (uid, file_id, cols = '*') => {
+  return await BackupFileModel.getFileByFilter({
+    uid,
+    id: file_id
+  }, cols)
 }
 
-module.exports.delFile = async file_id => {
-  return await BackupFileModel.delFile(file_id)
+module.exports.delFile = async (uid, file_id) => {
+  return await BackupFileModel.delFileByFilter({
+    uid,
+    id: file_id
+  })
 }
 
-module.exports.getImgList = async (last_id, last_file_time, size = 10) => {
+module.exports.getFileTokenInfo = async (id, token) => {
+  const file = await BackupFileModel.getFileByFilter({ id }, 'uid')
+  if (!file) {
+    return null
+  }
+  const account = await ClientAccountModel.getAccountByFilter({ uid: file.uid }, 'salt')
+  if (!account) {
+    return null
+  }
+  const secret = Util.md5(id, account.salt)
+  return JWT.decrypt(token, secret)
+}
+
+module.exports.getImgList = async (uid, last_id, last_file_time, size = 10) => {
   const file_list = await BackupFileModel.getImgList(
+    uid,
     last_file_time,
     'id,file_size,file_md5,file_name,file_type,file_time,client_type,width,height,create_time',
     size * 2)
+  const account = await ClientAccountModel.getAccountByFilter({ uid }, 'salt')
   const res_list = []
   for (let file of file_list) {
     if (file.id === last_id && res_list.length > 0) {
       res_list.splice(0, res_list.length)
       continue
     }
-    file.file_url = `/api/v1/h5/file/${file.id}`
+    const secret = Util.md5(file.id, account.salt)
+    const token = JWT.encrypt({
+      id: file.id,
+      uid
+    }, secret)
+    file.file_url = `/api/v1/h5/file/${file.id}?token=${token}`
     res_list.push(file)
     if (res_list.length === size) {
       break
@@ -210,7 +260,9 @@ module.exports.clearTrash = async () => {
       if (id > last_id) {
         last_id = id
       }
-      const exist_file = await BackupFileModel.getFileByMd5(file_md5, 'id')
+      const exist_file = await BackupFileModel.getFileByFilter({
+        file_md5
+      }, 'id')
       if (!exist_file) {
         FileUtil.delFile(server_path)
       }

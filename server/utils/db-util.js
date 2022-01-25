@@ -40,7 +40,7 @@ module.exports.insert = async (table, model, resInsertId = false) => {
         return reduceRes
     }, {paramStr: '', paramValues: []})
     if (!paramStr) {
-        console.error(`数据插入失败 table=${table}`, model)
+        console.error(`Insert fail. TABLE=${table}`, model)
         if (resInsertId) {
             return -1
         }
@@ -71,7 +71,7 @@ module.exports.update = async (table, model, where = '1=1', values = []) => {
     }, {paramStr: '', paramValues: []})
 
     if (!paramStr) {
-        console.error(`数据更新失败 table=${table}`, model, where, values)
+        console.error(`Update fail. TABLE=${table}`, model, where, values)
         return false
     }
     paramStr = paramStr.substr(0, paramStr.length - 1)
