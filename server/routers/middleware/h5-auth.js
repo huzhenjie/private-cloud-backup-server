@@ -1,57 +1,50 @@
 const UserService = require('../../services/user')
 const FileService = require('../../services/file')
 
-const IGNORE_LIST = [
+const IGNORE_RULE = [
   '/api/v1/h5/login',
   '/api/v1/h5/account',
   '/favicon.ico',
   '/test'
 ]
 
-const FILE_AUTH = [
+const FILE_AUTH_RULE = [
   '/api/v1/h5/file'
 ]
 
-module.exports = async (ctx, next) => {
-  if (IGNORE_LIST.includes(ctx.path)) {
-    return await next()
-  }
-  if (ctx.request.method === 'GET') {
-    const is_file_auth = FILE_AUTH.some(item => ctx.path.startsWith(item))
-    if (is_file_auth) {
-      const token = ctx.request.query.token
-      if (!token) {
-        ctx.body = {
-          code: 4440,
-          msg: 'Token expired'
-        }
-        return
-      }
-      const path_arr = ctx.path.split('/')
-      const id = path_arr[path_arr.length - 1]
-      const file_token_info = await FileService.getFileTokenInfo(id, token)
-      if (!file_token_info) {
-        ctx.body = {
-          code: 4441,
-          msg: 'Token expired'
-        }
-        return
-      }
-      if (file_token_info.id !== parseInt(id)) {
-        ctx.body = {
-          code: 4442,
-          msg: 'Token expired'
-        }
-        return
-      }
-      ctx.uid = file_token_info.uid
-      return await next()
+async function dealWithFileAuth(ctx, next) {
+  const token = ctx.request.query.token
+  if (!token) {
+    ctx.body = {
+      code: 4440,
+      msg: 'Token expired'
     }
+    return
   }
+  const path_arr = ctx.path.split('/')
+  const id = path_arr[path_arr.length - 1]
+  const file_token_info = await FileService.getFileTokenInfo(id, token)
+  if (!file_token_info) {
+    ctx.body = {
+      code: 4441,
+      msg: 'Token expired'
+    }
+    return
+  }
+  if (file_token_info.id !== parseInt(id)) {
+    ctx.body = {
+      code: 4442,
+      msg: 'Token expired'
+    }
+    return
+  }
+  ctx.uid = file_token_info.uid
+  return await next()
+}
 
-  const uid = ctx.headers['x-uid']
+async function dealWithApiAuth(ctx, next) {
+  const uid = ctx.header['x-uid']
   const authorization = ctx.header.authorization
-  console.log('xxxx', uid, authorization)
   if (!uid || !authorization) {
     ctx.body = {
       code: 444,
@@ -70,4 +63,20 @@ module.exports = async (ctx, next) => {
   }
   ctx.uid = uid
   await next()
+}
+
+module.exports = async (ctx, next) => {
+  const { path, request } = ctx
+  if (IGNORE_RULE.includes(path)) {
+    return await next()
+  }
+  if (request.method === 'GET') {
+    const is_file_auth = FILE_AUTH_RULE.some(item => path.startsWith(item))
+    if (is_file_auth) {
+      await dealWithFileAuth(ctx, next)
+      return
+    }
+  }
+
+  await dealWithApiAuth(ctx, next)
 }
