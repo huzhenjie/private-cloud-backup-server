@@ -76,7 +76,7 @@ module.exports.download = async ctx => {
       }
       return
     }
-    ctx.attachment(file.file_name)
+    ctx.attachment(file.file_name, { type: 'inline' })
     await Send(ctx, file.server_path, { root: '/'})
   } catch (e) {
     console.error(e)
